@@ -3,7 +3,7 @@ package io.github.wjur.avsc2avdl.domain
 
 class SchemaPrinter {
     fun writeString(schema: Schema): String {
-        return """@namespace("${schema.namespace}")
+        return """${schema.writeNamespaceString()}
 protocol ${schema.name} {
 ${schema.writeDocString(0)}${tabs(0)}record ${schema.name} {
 ${schema.fields.writeFieldsString(1)}
@@ -39,6 +39,7 @@ private fun TypeDef.subRecords(): Sequence<PrintableClass> {
         is LongTypeDef,
         is StringTypeDef,
         is BooleanTypeDef -> emptySequence()
+
         is EnumTypeDef -> sequenceOf(PrintableEnum(this))
         is UnionTypeDef -> this.subRecords()
         is RecordTypeDef -> this.subRecords()
@@ -61,8 +62,12 @@ private fun Documentable.writeDocString(level: Int): String {
     return if (this.documentation != null) "${tabs(level)}/** ${this.documentation} */\n" else ""
 }
 
+private fun Schema.writeNamespaceString(): String {
+    return if (this.namespace != null) """@namespace("${this.namespace}")""" else ""
+}
+
 private fun List<Field>.writeFieldsString(level: Int): String {
-    return this.joinToString("\n\n") {
+    return this.joinToString("\n") {
         """${it.writeDocString(level)}${tabs(level)}${it.writeTypeName()}${it.writeUserDataType()} ${it.name}${it.writeDefault()};"""
     }
 }
@@ -83,14 +88,15 @@ private fun Field.writeTypeName(): String {
     return writeTypeName(type)
 }
 
-private fun Field.writeUserDataType(): String = userDataType?.let { " @userDataType(\"${it.value}\")"} ?: ""
+private fun Field.writeUserDataType(): String = userDataType?.let { " @userDataType(\"${it.value}\")" } ?: ""
 private fun TypeDef.writeJavaClass(): String {
-    val annotations = when(this) {
+    val annotations = when (this) {
         NullTypeDef,
         is UnionTypeDef,
         is RecordTypeDef,
         is EnumTypeDef,
         is ReferenceByNameTypeDef -> null
+
         is IntTypeDef -> this.stringableJavaClass?.let { "@java-class(\"$it\")" }
         is LongTypeDef -> this.stringableJavaClass?.let { "@java-class(\"$it\")" }
         is StringTypeDef -> this.stringableJavaClass?.let { "@java-class(\"$it\")" }
@@ -100,6 +106,7 @@ private fun TypeDef.writeJavaClass(): String {
                 this.stringableKeyJavaClass?.let { "@java-key-class(\"$it\")" },
                 this.stringableJavaClass?.let { "@java-class(\"$it\")" }
             ).filterNotNull().joinToString(" ").takeIf { it.isNotEmpty() }
+
         is ArrayTypeDef -> sequenceOf(
             this.stringableKeyJavaClass?.let { "@java-key-class(\"$it\")" },
             this.stringableJavaClass?.let { "@java-class(\"$it\")" }

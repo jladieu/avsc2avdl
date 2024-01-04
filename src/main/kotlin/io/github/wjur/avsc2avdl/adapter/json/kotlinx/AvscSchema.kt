@@ -8,7 +8,7 @@ import kotlinx.serialization.json.JsonPrimitive
 data class AvscSchema(
     val type: String,
     val name: String,
-    val namespace: String,
+    val namespace: String? = null,
     val doc: String? = null,
     val fields: List<AvscField>
 )

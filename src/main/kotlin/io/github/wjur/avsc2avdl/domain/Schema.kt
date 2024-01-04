@@ -2,7 +2,7 @@ package io.github.wjur.avsc2avdl.domain
 
 data class Schema(
     val name: String,
-    val namespace: String,
+    val namespace: String?,
     override val documentation: String?,
     val fields: List<Field>
 ) : Documentable
@@ -21,7 +21,7 @@ sealed class DefaultValue
 object DefaultNull : DefaultValue()
 data class DefaultString(val value: String) : DefaultValue()
 data class DefaultNumber(val value: Number) : DefaultValue()
-data class DefaultBoolean(val value: Boolean): DefaultValue()
+data class DefaultBoolean(val value: Boolean) : DefaultValue()
 object DefaultEmptyArray : DefaultValue()
 object DefaultEmptyMap : DefaultValue()
 
@@ -39,20 +39,25 @@ data class RecordTypeDef(
     override val documentation: String?,
     val fields: List<Field>
 ) : TypeDef(), Documentable
+
 data class MapTypeDef(
     val valueType: TypeDef,
     val stringableJavaClass: String? = null,
-    val stringableKeyJavaClass: String? = null) : TypeDef()
+    val stringableKeyJavaClass: String? = null
+) : TypeDef()
+
 data class ArrayTypeDef(
     val itemType: TypeDef,
     val stringableJavaClass: String? = null,
     val stringableKeyJavaClass: String? = null
 ) : TypeDef()
+
 data class EnumTypeDef(
     val name: String,
     override val documentation: String?,
     val symbols: List<String>
 ) : TypeDef(), Documentable
+
 data class ReferenceByNameTypeDef(val name: String) : TypeDef()
 
 interface Documentable {
