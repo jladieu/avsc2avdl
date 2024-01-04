@@ -1,8 +1,6 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-    kotlin("jvm") version "1.4.10"
-    kotlin("plugin.serialization") version "1.4.10"
+    kotlin("jvm") version "1.9.22"
+    kotlin("plugin.serialization") version "1.9.22"
     java
     application
 }
@@ -19,14 +17,13 @@ dependencies {
     testImplementation(group = "org.assertj", name = "assertj-core", version = "3.13.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.2.0")
 }
-tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "1.8"
-}
 
 tasks.withType<Test> {
     useJUnitPlatform()
 }
 
 application {
-    mainClassName = "MainKt"
+    mainClass.set("MainKt") // The main class of the application
 }
+
+
